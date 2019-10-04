@@ -39,6 +39,9 @@ uint8_t Bat_BatteryLoad = 0;
 float batLevel_LEDyellow = 3.7;
 float batLevel_LEDred = 3.2;
 float batLevel_Empty = 2.85;
+uint8_t batLevel_EmptyCounter = 0;
+uint8_t batLevel_LEDyellowCounter = 0;
+uint8_t batLevel_LEDredCounter = 0;
 
 struct folderSettings {
   uint8_t folder;
@@ -1005,29 +1008,49 @@ batteryCheck();
      Serial.println(Bat_Mean);
     
         if (Bat_Mean > batLevel_LEDyellow)
-        {
-         // Serial.println("Battery Status: Green");
-        batLevel_LEDyellow = batLevel_LEDyellowOn;
-        setColor(0, 255, 0); // Green Color
+        {    
+          batLevel_LEDyellowCounter = 0;
+          batLevel_LEDyellow = batLevel_LEDyellowOn;
+          setColor(0, 255, 0); // Green Color
         }
     
         else if (Bat_Mean < batLevel_LEDyellow && Bat_Mean > batLevel_LEDred )
         {
-         // Serial.println("Battery Status: Yellow");
-         batLevel_LEDyellow = batLevel_LEDyellowOff;
-         batLevel_LEDred = batLevel_LEDredOn;
-         setColor(182, 255, 0); // Yellow Color
+           if (batLevel_LEDyellowCounter >= 10)
+          {
+             batLevel_LEDredCounter = 0;
+             batLevel_LEDyellowCounter = 0;
+             batLevel_LEDyellow = batLevel_LEDyellowOff;
+             batLevel_LEDred = batLevel_LEDredOn;
+             setColor(182, 255, 0); // Yellow Color
+          }
+          else
+             batLevel_LEDyellowCounter ++;
+           
         }
     
         else if (Bat_Mean < batLevel_LEDred && Bat_Mean > batLevel_Empty)
-        {
-         // Serial.println("Battery Status: Red");
-        batLevel_LEDred = batLevel_LEDredOff;
-        setColor(0, 0, 255); // Red Color
+        {  
+          if (batLevel_LEDredCounter >= 10)
+          {
+            batLevel_EmptyCounter =0;
+            batLevel_LEDredCounter = 0;
+            batLevel_LEDred = batLevel_LEDredOff;
+            setColor(0, 0, 255); // Red Color
+          }
+          else
+            batLevel_LEDredCounter ++;     
+          
         }
         else if (Bat_Mean <= batLevel_Empty)
         {
-          shutDown();
+          if (batLevel_EmptyCounter >= 10)
+          {
+            batLevel_EmptyCounter =0;
+            shutDown();
+          }
+          else
+           batLevel_EmptyCounter++; 
         }        
    }
 
