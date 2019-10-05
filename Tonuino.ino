@@ -19,6 +19,7 @@
 
 // uncomment the below line to enable five button support
 //#define FIVEBUTTONS
+#define CHECK_BATTERY
 
 static const uint32_t cardCookie = 322417479;
 
@@ -36,7 +37,7 @@ float Bat_SqrMean=0.0;
 float Bat_VarMean=0.0;
 uint8_t Bat_N=0;
 uint8_t Bat_BatteryLoad = 0;
-float batLevel_LEDyellow = 3.7;
+float batLevel_LEDyellow = 3.6;
 float batLevel_LEDred = 3.2;
 float batLevel_Empty = 2.85;
 uint8_t batLevel_EmptyCounter = 0;
@@ -667,25 +668,26 @@ MFRC522::StatusCode status;
 #define LONG_PRESS 1000
 
 /////////////////////////////////////Eigener Code: Festwerte Batterie Messung//////////////////////////////////
+#ifdef CHECK_BATTERY
 #define batMeasPin A7
-#define LEDgreenPin 5
-#define LEDbluePin 6
-#define LEDredPin 8
+#define LEDgreenPin 6
+#define LEDbluePin 8
+#define LEDredPin 5
 
-#define refVoltage 1.1
+#define refVoltage 1.08
 #define pinSteps 1024.0
 
-#define batLevel_LEDyellowOn 3.6
-#define batLevel_LEDyellowOff 3.8
+#define batLevel_LEDyellowOn 3.5
+#define batLevel_LEDyellowOff 3.7
 
 #define batLevel_LEDredOn 3.1
-#define batLevel_LEDredOff 3.3
+#define batLevel_LEDredOff 3.2
 
 #define batLevel_Empty 2.9
 
 #define Rone 6680.0
 #define Rtwo 987.0
-
+#endif
 ///////////////////////////////////////////////////////////////////////////////////
 Button pauseButton(buttonPause);
 Button upButton(buttonUp);
@@ -768,13 +770,14 @@ void setup() {
   randomSeed(ADCSeed); // Zufallsgenerator initialisieren
 
   /////////////////////Eigerner Code////////////////////
+  #ifdef CHECK_BATTERY
   analogReference(INTERNAL);
   delay(100);
   pinMode(LEDredPin, OUTPUT);
   pinMode(LEDgreenPin, OUTPUT);
   pinMode(LEDbluePin, OUTPUT);
-
-  setColor(255, 255, 255); // White Color
+  setColor(0, 10, 0); // White Color
+  #endif
   /////////////////////Ende Eigerner Code////////////////////
   
   // Dieser Hinweis darf nicht entfernt werden
@@ -878,19 +881,23 @@ void volumeDownButton() {
 }
 
 void nextButton() {
+ 
+  
   if (activeModifier != NULL)
     if (activeModifier->handleNextButton() == true)
       return;
-
+      
   nextTrack(random(65536));
   delay(1000);
 }
 
 void previousButton() {
+
+  
   if (activeModifier != NULL)
     if (activeModifier->handlePreviousButton() == true)
       return;
-
+      
   previousTrack();
   delay(1000);
 }
@@ -998,64 +1005,11 @@ void loop() {
     checkStandbyAtMillis();
     mp3.loop();
 /////////////////////////////////////Eigener Code: Ladung prüfen//////////////////////////////////
-
-batteryCheck();
-    
-   if (Bat_N > 25)
-   {
-     
-     Serial.print("Battery Voltage: ");  
-     Serial.println(Bat_Mean);
-    
-        if (Bat_Mean > batLevel_LEDyellow)
-        {    
-          batLevel_LEDyellowCounter = 0;
-          batLevel_LEDyellow = batLevel_LEDyellowOn;
-          setColor(0, 255, 0); // Green Color
-        }
-    
-        else if (Bat_Mean < batLevel_LEDyellow && Bat_Mean > batLevel_LEDred )
-        {
-           if (batLevel_LEDyellowCounter >= 10)
-          {
-             batLevel_LEDredCounter = 0;
-             batLevel_LEDyellowCounter = 0;
-             batLevel_LEDyellow = batLevel_LEDyellowOff;
-             batLevel_LEDred = batLevel_LEDredOn;
-             setColor(182, 255, 0); // Yellow Color
-          }
-          else
-             batLevel_LEDyellowCounter ++;
-           
-        }
-    
-        else if (Bat_Mean < batLevel_LEDred && Bat_Mean > batLevel_Empty)
-        {  
-          if (batLevel_LEDredCounter >= 10)
-          {
-            batLevel_EmptyCounter =0;
-            batLevel_LEDredCounter = 0;
-            batLevel_LEDred = batLevel_LEDredOff;
-            setColor(0, 0, 255); // Red Color
-          }
-          else
-            batLevel_LEDredCounter ++;     
-          
-        }
-        else if (Bat_Mean <= batLevel_Empty)
-        {
-          if (batLevel_EmptyCounter >= 10)
-          {
-            batLevel_EmptyCounter =0;
-            shutDown();
-          }
-          else
-           batLevel_EmptyCounter++; 
-        }        
-   }
-
-
+#ifdef CHECK_BATTERY
+   batteryCheck();
+#endif
 /////////////////////////////////////Eigener Code Ende/////////////////////////////
+
     // Modifier : WIP!
     if (activeModifier != NULL) {
       activeModifier->loop();
@@ -1077,10 +1031,12 @@ batteryCheck();
     }
 
     if (pauseButton.wasReleased()) {
+
       if (activeModifier != NULL)
         if (activeModifier->handlePause() == true)
           return;
       if (ignorePauseButton == false)
+       
         if (isPlaying()) {
           mp3.pause();
           setstandbyTimer();
@@ -1131,6 +1087,7 @@ batteryCheck();
   }
  
    if (upButton.pressedFor(LONG_PRESS)) {
+
 #ifndef FIVEBUTTONS
       if (isPlaying()) {
         if (!mySettings.invertVolumeButtons) {
@@ -1222,13 +1179,6 @@ batteryCheck();
 
   if (readCard(&myCard) == true) {
     if (myCard.cookie == cardCookie && myCard.nfcFolderSettings.folder != 0 && myCard.nfcFolderSettings.mode != 0) {
-/////////////////////////////////////Eigener Code//////////////////////////////////
-          mp3.playMp3FolderTrack(263); //Play Tape Insert Sound
-          delay(500);
-          while (isPlaying()){
-          }
-      
-/////////////////////////////////////Eigener Code Ende/////////////////////////////
       playFolder();
     }
 
@@ -1948,16 +1898,70 @@ void batteryCheck ()
       Bat_N=Bat_N+1;    
     }
 
+  if (Bat_N > 10)
+   {
+     
+     Serial.print("Battery Voltage: ");  
+     Serial.println(Bat_Mean);
+    
+        if (Bat_Mean > batLevel_LEDyellow)
+        {    
+          batLevel_LEDyellowCounter = 0;
+          batLevel_LEDyellow = batLevel_LEDyellowOn;
+          setColor(0, 10, 0); // Green Color
+          Serial.println("green");
+        }
+    
+        else if (Bat_Mean < batLevel_LEDyellow && Bat_Mean > batLevel_LEDred )
+        {
+           if (batLevel_LEDyellowCounter >= 10)
+          {
+             batLevel_LEDredCounter = 0;
+             batLevel_LEDyellowCounter = 0;
+             batLevel_LEDyellow = batLevel_LEDyellowOff;
+             batLevel_LEDred = batLevel_LEDredOn;
+             setColor(20, 10, 0); // Yellow Color
+             Serial.println("yellow");
+          }
+          else
+             batLevel_LEDyellowCounter ++;
+           
+        }
+    
+        else if (Bat_Mean < batLevel_LEDred && Bat_Mean > batLevel_Empty)
+        {  
+          if (batLevel_LEDredCounter >= 10)
+          {
+            batLevel_EmptyCounter =0;
+            batLevel_LEDredCounter = 0;
+            batLevel_LEDred = batLevel_LEDredOff;
+            setColor(20, 0, 0); // Red Color
+            Serial.println("red");
+          }
+          else
+            batLevel_LEDredCounter ++;     
+          
+        }
+        else if (Bat_Mean <= batLevel_Empty)
+        {
+          if (batLevel_EmptyCounter >= 10)
+          {
+            batLevel_EmptyCounter =0;
+            shutDown();
+          }
+          else
+           batLevel_EmptyCounter++; 
+        }        
+   }
 }
-///////////////////////////////////////// Eignener Code: Funktion shutDown   ///////////////////////////////////
+///////////////////////////////////////// Eignener Code ///////////////////////////////////
 void shutDown ()
 {
   Serial.println("Shut Down");
   mp3.pause();
-  mp3.playMp3FolderTrack(262); //Play Button Sound
-  delay(500);
-   while (isPlaying()){
-   }
+  #ifdef PLAY_SOUNDS
+  playSound(262); //Play Button Sound
+  #endif
    digitalWrite(shutdownPin, HIGH);
    delay(1000);
    
