@@ -37,12 +37,11 @@ float Bat_SqrMean=0.0;
 float Bat_VarMean=0.0;
 uint8_t Bat_N=0;
 uint8_t Bat_BatteryLoad = 0;
-float batLevel_LEDyellow = 3.6;
-float batLevel_LEDred = 3.2;
-float batLevel_Empty = 2.85;
 uint8_t batLevel_EmptyCounter = 0;
 uint8_t batLevel_LEDyellowCounter = 0;
 uint8_t batLevel_LEDredCounter = 0;
+float batLevel_LEDyellow;
+float batLevel_LEDred;
 
 struct folderSettings {
   uint8_t folder;
@@ -777,6 +776,9 @@ void setup() {
   pinMode(LEDgreenPin, OUTPUT);
   pinMode(LEDbluePin, OUTPUT);
   setColor(0, 10, 0); // White Color
+
+  batLevel_LEDyellow = batLevel_LEDyellowOn;
+  batLevel_LEDred = batLevel_LEDredOn;
   #endif
   /////////////////////Ende Eigerner Code////////////////////
   
@@ -1900,16 +1902,13 @@ void batteryCheck ()
 
   if (Bat_N > 10)
    {
-     
-     Serial.print("Battery Voltage: ");  
-     Serial.println(Bat_Mean);
-    
+         
         if (Bat_Mean > batLevel_LEDyellow)
         {    
           batLevel_LEDyellowCounter = 0;
           batLevel_LEDyellow = batLevel_LEDyellowOn;
           setColor(0, 10, 0); // Green Color
-          Serial.println("green");
+          
         }
     
         else if (Bat_Mean < batLevel_LEDyellow && Bat_Mean > batLevel_LEDred )
@@ -1921,7 +1920,7 @@ void batteryCheck ()
              batLevel_LEDyellow = batLevel_LEDyellowOff;
              batLevel_LEDred = batLevel_LEDredOn;
              setColor(20, 10, 0); // Yellow Color
-             Serial.println("yellow");
+             
           }
           else
              batLevel_LEDyellowCounter ++;
@@ -1936,7 +1935,7 @@ void batteryCheck ()
             batLevel_LEDredCounter = 0;
             batLevel_LEDred = batLevel_LEDredOff;
             setColor(20, 0, 0); // Red Color
-            Serial.println("red");
+            
           }
           else
             batLevel_LEDredCounter ++;     
