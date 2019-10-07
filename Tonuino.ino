@@ -19,7 +19,7 @@
 
 // uncomment the below line to enable five button support
 //#define FIVEBUTTONS
-#define CHECK_BATTERY
+//#define CHECK_BATTERY
 
 static const uint32_t cardCookie = 322417479;
 
@@ -667,11 +667,12 @@ MFRC522::StatusCode status;
 #define LONG_PRESS 1000
 
 /////////////////////////////////////Eigener Code: Festwerte Batterie Messung//////////////////////////////////
+#define SpeakerOnPin 8
+#define LEDgreenPin 6
+#define LEDredPin 5
+
 #ifdef CHECK_BATTERY
 #define batMeasPin A7
-#define LEDgreenPin 6
-#define LEDbluePin 8
-#define LEDredPin 5
 
 #define refVoltage 1.08
 #define pinSteps 1024.0
@@ -687,6 +688,7 @@ MFRC522::StatusCode status;
 #define Rone 6680.0
 #define Rtwo 987.0
 #endif
+
 ///////////////////////////////////////////////////////////////////////////////////
 Button pauseButton(buttonPause);
 Button upButton(buttonUp);
@@ -769,12 +771,13 @@ void setup() {
   randomSeed(ADCSeed); // Zufallsgenerator initialisieren
 
   /////////////////////Eigerner Code////////////////////
+  digitalWrite(SpeakerOnPin, LOW);
   #ifdef CHECK_BATTERY
   analogReference(INTERNAL);
   delay(100);
   pinMode(LEDredPin, OUTPUT);
   pinMode(LEDgreenPin, OUTPUT);
-  pinMode(LEDbluePin, OUTPUT);
+  pinMode(SpeakerOnPin, OUTPUT);
   setColor(0, 10, 0); // White Color
 
   batLevel_LEDyellow = batLevel_LEDyellowOn;
@@ -817,7 +820,7 @@ void setup() {
   .PCD_DumpVersionToSerial(); // Show details of PCD - MFRC522 Card Reader
   for (byte i = 0; i < 6; i++) {
     key.keyByte[i] = 0xFF;
-
+  
 
   }
 
@@ -841,9 +844,17 @@ void setup() {
     }
     loadSettingsFromFlash();
   }
-
+  digitalWrite(SpeakerOnPin, HIGH);
+  
   // Start Shortcut "at Startup" - e.g. Welcome Sound
-  playShortCut(3);
+  //playShortCut(3);
+
+   mp3.playMp3FolderTrack(264);
+   delay(800);
+   do {
+    delay(10);
+   } while (isPlaying());
+   
 }
 
 void readButtons() {
@@ -1076,12 +1087,10 @@ void loop() {
 //
 /////////////////////////////////////Eigener Code//////////////////////////////////
      
-      do {
-        pauseButton.read();
-      } while (pauseButton.isPressed());
-      
-     //delay(100);
-      
+//      do {
+//        pauseButton.read();
+//      } while (pauseButton.isPressed());
+//      
      ignorePauseButton = true;
      shutDown();
   
@@ -1887,6 +1896,7 @@ bool checkTwo ( uint8_t a[], uint8_t b[] ) {
   return true;
 }
 ///////////////////////////////////////// Eignener Code: Akku Ladung Messen   ///////////////////////////////////
+#ifdef BATTERY_CHECK
 void batteryCheck ()
 {
   float physValue;
@@ -1953,14 +1963,27 @@ void batteryCheck ()
         }        
    }
 }
+#endif
 ///////////////////////////////////////// Eignener Code ///////////////////////////////////
+
+
+
+
 void shutDown ()
 {
   Serial.println("Shut Down");
   mp3.pause();
-  #ifdef PLAY_SOUNDS
-  playSound(262); //Play Button Sound
-  #endif
+  delay(200);
+   mp3.setVolume(mySettings.initVolume);
+   delay(500);
+   mp3.playMp3FolderTrack(265);
+   delay(800);
+   do {
+    delay(10);
+   } while (isPlaying());
+
+   digitalWrite(SpeakerOnPin, LOW);
+   delay(800);
    digitalWrite(shutdownPin, HIGH);
    delay(1000);
    
@@ -1969,5 +1992,5 @@ void shutDown ()
 void setColor(int redValue, int greenValue, int blueValue) {
   analogWrite(LEDredPin, redValue);
   analogWrite(LEDgreenPin, greenValue);
-  analogWrite(LEDbluePin, blueValue);
+  //analogWrite(LEDbluePin, blueValue);
 }
