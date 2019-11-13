@@ -18,9 +18,12 @@
 */
 
 // uncomment the below line to enable five button support
-#define FIVEBUTTONS
+//#define FIVEBUTTONS
 #define CHECK_BATTERY
 #define DEBUG
+#define PUSH_ON_OFF
+#define STARTUP_SOUND
+#define SPEAKER_SWITCH
 
 #define buttonPause A0
 #define buttonUp A1
@@ -1087,12 +1090,15 @@ void setup() {
   pinMode(busyPin, INPUT);
 
   /////////////////////Eigerner Code////////////////////
+#ifdef SPEAKER_SWITCH
+  pinMode(SpeakerOnPin, OUTPUT);
   digitalWrite(SpeakerOnPin, LOW);
+#endif
 #ifdef CHECK_BATTERY
   analogReference(INTERNAL);
   pinMode(LEDredPin, OUTPUT);
   pinMode(LEDgreenPin, OUTPUT);
-  pinMode(SpeakerOnPin, OUTPUT);
+
   setColor(0, 10, 0); // White Color
 
   batLevel_LEDyellow = batLevel_LEDyellowOn;
@@ -1149,17 +1155,19 @@ void setup() {
     }
     loadSettingsFromFlash();
   }
+#ifdef SPEAKER_SWITCH
   digitalWrite(SpeakerOnPin, HIGH);
+#endif
 
   // Start Shortcut "at Startup" - e.g. Welcome Sound
   //playShortCut(3);
 
-
+#ifdef STARTUP_SOUND
   mp3.playMp3FolderTrack(264);
   delay(800);
   do {
   } while (isPlaying());
-
+#endif
 }
 
 void readButtons() {
@@ -1461,6 +1469,8 @@ void shutDown () {
 #ifdef DEBUG
   Serial.println("Shut Down");
 #endif
+
+#ifdef STARTUP_SOUND
   mp3.pause();
   delay(200);
   mp3.setVolume(mySettings.initVolume);
@@ -1468,11 +1478,13 @@ void shutDown () {
   mp3.playMp3FolderTrack(265);
   delay(800);
   do {
-    delay(10);
   } while (isPlaying());
+#endif
 
+#ifdef SPEAKER_SWITCH
   digitalWrite(SpeakerOnPin, LOW);
-  delay(800);
+#endif
+
   digitalWrite(shutdownPin, HIGH);
   delay(1000);
 
@@ -1524,11 +1536,14 @@ void loop() {
           disablestandbyTimer();
         }
       ignorePauseButton = false;
-    } else if (pauseButton.pressedFor(LONG_PRESS) &&
+    }
+#ifdef PUSH_ON_OFF	
+	else if (pauseButton.pressedFor(LONG_PRESS) &&
                ignorePauseButton == false) {
       ignorePauseButton = true;
       shutDown();
     }
+#endif
 
     if (upButton.pressedFor(LONG_PRESS)) {
 
