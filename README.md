@@ -13,7 +13,8 @@ Mein eigener Fork der TonUINO DEV 2.1
 Neues Feature: Puzzle Spiel
 
 Ein simples Spiel für den TonUINO, dass zwei zueinander gehörende Karten erwartet.
-Ihr müsst dafür auch ein paar MP3s in eurem mp3 Ordner auf der SD-Karte ergänzen. Diese könnt ihr hier herunter laden.
+Ihr müsst dafür auch ein paar MP3s in eurem mp3 Ordner auf der SD-Karte ergänzen/ersetzen. Diese könnt ihr hier herunter laden.
+Löscht bitte die vorhandenen DAteien 310-318. Diese mussten umbenannt werden.
 
 Funktion:
 1. Als erstes müsst Ihr die Modifikationskarte "Puzzlespiel" über das Admin Menü erstellen.
