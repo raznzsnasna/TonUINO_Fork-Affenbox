@@ -10,7 +10,7 @@ Mein eigener Fork der TonUINO DEV 2.1
 - Serielle Ausgaben können über ein #define zu/abgeschaltete werden (27% Speicherersparnis ohne Ausgaben)
 - beschleunigter setup() durch anpassung der Reihenfolge und entferen des 2sec Delays nach der initialisierung des DFPlayers
 
-## Neues Feature: Puzzle Spiel
+# Neues Feature: Puzzle Spiel
 
 Ein simples Spiel für den TonUINO, dass zwei zueinander gehörende Karten erwartet.
 Ihr müsst dafür auch ein paar MP3s in eurem mp3 Ordner auf der SD-Karte ergänzen/ersetzen. Diese könnt ihr hier herunter laden.
