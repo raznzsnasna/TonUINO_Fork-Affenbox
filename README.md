@@ -45,14 +45,22 @@ Die RFID Tags sind wie folgt beschrieben:
 
 ### Puzzleteil
 Card Cookie: 0x13 37 B3 47
+
 Ordner: 0x01 bis 0x63 (1 bis 99)
+
 Modus: 0x0A (Puzzle/Quiz)
+
 Extra: 0x01 bis 0xFF (1 bis 255) (Nummer des Tracks)
+
 Extra2: 0x01 bis 0xFF (1 bis 255) (Nummer des Puzzleteils)
 
 ### Modifiertag
 Card Cookie: 0x13 37 B3 47
+
 Ordner: 0x00
+
 Modus: 0x08 (Puzzlespiel)
+
 Extra: 0x00
+
 Extra2: 0x00
