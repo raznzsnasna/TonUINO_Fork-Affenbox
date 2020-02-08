@@ -10,13 +10,13 @@ Mein eigener Fork der TonUINO DEV 2.1
 - Serielle Ausgaben können über ein #define zu/abgeschaltete werden (27% Speicherersparnis ohne Ausgaben)
 - beschleunigter setup() durch anpassung der Reihenfolge und entferen des 2sec Delays nach der initialisierung des DFPlayers
 
-Neues Feature: Puzzle Spiel
+## Neues Feature: Puzzle Spiel
 
 Ein simples Spiel für den TonUINO, dass zwei zueinander gehörende Karten erwartet.
 Ihr müsst dafür auch ein paar MP3s in eurem mp3 Ordner auf der SD-Karte ergänzen/ersetzen. Diese könnt ihr hier herunter laden.
-Löscht bitte die vorhandenen DAteien 310-318. Diese mussten umbenannt werden.
+Löscht bitte die vorhandenen Dateien 310-318. Diese mussten umbenannt werden.
 
-Funktion:
+### Funktion:
 1. Als erstes müsst Ihr die Modifikationskarte "Puzzlespiel" über das Admin Menü erstellen.
 
 2. Danach müsst ihr zwei Puzzleteile über die Normale Kartenkonfiguration erstellen. 
@@ -38,3 +38,21 @@ Ihr könnt nun ein beliebiges Puzzleteil auflegen, und das MP3 dazu wird abgespi
 - Ihr könnt den Pausetaster drücken und hört die letzte Ausgabe erneut oder stoppt eine laufende Ausgabe
 
 5. Das Spiel wird durch erneutes Auflegen der Modifikationskarte beendet.
+
+## Inhalt der Tags
+
+Die RFID Tags sind wie folgt beschrieben:
+
+### Puzzleteil
+Card Cookie: 0x13 37 B3 47
+Ordner: 0x01 bis 0x63 (1 bis 99)
+Modus: 0x0A (Puzzle/Quiz)
+Extra: 0x01 bis 0xFF (1 bis 255) (Nummer des Tracks)
+Extra2: 0x01 bis 0xFF (1 bis 255) (Nummer des Puzzleteils)
+
+### Modifiertag
+Card Cookie: 0x13 37 B3 47
+Ordner: 0x00
+Modus: 0x08 (Puzzlespiel)
+Extra: 0x00
+Extra2: 0x00
