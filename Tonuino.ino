@@ -538,6 +538,8 @@ class PuzzleGame: public Modifier {
     void CompareParts()
     {
       if ((PartOneSpecial == PartTwoSpecial) && (PartOneFolder == PartTwoFolder) && (PartOneSpecial2 == PartTwoSpecial2)) {
+	PartTwoSaved = false;
+        return;
       }
       else if (((PartOneSpecial !=  PartTwoSpecial) || (PartOneFolder != PartTwoFolder)) && (PartOneSpecial2 == PartTwoSpecial2)) {
         Success();
