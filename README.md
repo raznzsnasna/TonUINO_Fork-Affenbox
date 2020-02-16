@@ -101,7 +101,7 @@ Card Cookie: 0x13 37 B3 47
 
 Ordner: 0x00
 
-Modus: 0x09 (Puzzlespiel)
+Modus: 0x0A (Button Smash)
 
 Extra: 0x01 bis 0x63 (1 bis 99) (Nummer des Ordners mit den Sounds)
 
