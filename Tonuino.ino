@@ -22,7 +22,7 @@
 //#define CHECK_BATTERY
 #define DEBUG
 //#define PUSH_ON_OFF
-//#define STARTUP_SOUND
+#define STARTUP_SOUND
 //#define SPEAKER_SWITCH
 
 #define buttonPause A0 //Default A0
@@ -32,7 +32,7 @@
 
 #define shutdownPin 7 //Default 7
 
-#define openAnalogPin A7
+#define openAnalogPin A7 //Default A7
 
 #ifdef FIVEBUTTONS
 #define buttonFourPin A3
@@ -586,6 +586,7 @@ class PuzzleGame: public Modifier {
 
     PuzzleGame(uint8_t special)
     {
+      mp3.loop();
       mp3.pause();
 #ifdef DEBUG
       Serial.println(F("=== PuzzleGame()"));
@@ -738,6 +739,7 @@ class QuizGame: public Modifier {
     }
 
     QuizGame(uint8_t special) {
+     mp3.loop();
 #ifdef DEBUG
       Serial.println(F("=== QuizGame()"));
 #endif     
@@ -860,22 +862,31 @@ class ButtonSmash: public Modifier {
     }
 
     ButtonSmash(uint8_t special, uint8_t special2) {
+      mp3.loop();
 #ifdef DEBUG
       Serial.println(F("=== ButtonSmash()"));
 #endif     
       mp3.pause();
-      delay(100);
-      mp3.setVolume(volume);   
-      delay(100);
-      
+      delay(200);
+#ifdef DEBUG
+        Serial.println(F("=== ButtonSmash() -> Set Volume"));
+#endif
+      mp3.setVolume(special2);   
+      delay(200);
+#ifdef DEBUG
+        Serial.println(F("=== ButtonSmash() -> Set Folder"));
+#endif     
       Folder = special;
       numTracksInFolder = mp3.getFolderTrackCount(Folder);
+#ifdef DEBUG
+        Serial.println(F("=== ButtonSmash() -> generate queue"));
+#endif 
       firstTrack = 1;
       shuffleQueue();
       currentTrack = 0;
       
 #ifdef DEBUG
-        Serial.println(F("=== ButtonSmash() -> Queue generated"));
+        Serial.println(F("=== ButtonSmash() -> Init End"));
 #endif
     }
     
@@ -1380,7 +1391,7 @@ void setup() {
   // Busy Pin
   pinMode(busyPin, INPUT);
   mp3.begin();
-  delay(500);
+  delay(1000);
   // Wert für randomSeed() erzeugen durch das mehrfache Sammeln von rauschenden LSBs eines offenen Analogeingangs
   uint32_t ADC_LSB;
   uint32_t ADCSeed;
@@ -1481,6 +1492,7 @@ void setup() {
 
 #ifdef STARTUP_SOUND
   mp3.playMp3FolderTrack(264);
+  delay(500);
 waitForTrackToFinish();
 #endif
 }
@@ -1663,7 +1675,8 @@ void playFolder() {
     Serial.println(
       F("Spezialmodus Puzzle"));
 #endif    
-    mp3.playFolderTrack(myFolder->folder, myFolder->special);
+    currentTrack = myFolder->special;
+    mp3.playFolderTrack(myFolder->folder, currentTrack);
   }
 
   while (!isPlaying() && counter <= 50) {
@@ -1789,19 +1802,15 @@ void shutDown () {
   delay(200);
   mp3.setVolume(mySettings.initVolume);
   delay(500);
-  mp3.playMp3FolderTrack(265);
-  delay(800);
-  do {
-  } while (isPlaying());
+#ifdef DEBUG
+  Serial.println("Shut Down Sound");
 #endif
-
-#ifdef SPEAKER_SWITCH
-  digitalWrite(SpeakerOnPin, LOW);
+  mp3.playMp3FolderTrack(265);
+    delay(4000);
+  //waitForTrackToFinish();
 #endif
 
   digitalWrite(shutdownPin, HIGH);
-  delay(1000);
-
 }
 
 void loop() {
@@ -2603,12 +2612,14 @@ void adminMenu(bool fromCard = false) {
             //          mp3.playAdvertisement(260);
             //          delay(100);
             //          mp3.pause();
-            mp3.pause();
-            delay(500);
+            //mp3.pause();
+            //delay(500);
             mp3.playMp3FolderTrack(260);
+            //delay(1000);
             waitForTrackToFinish();
           }
         }
+        delay(2000);
         switch (tempCard.nfcFolderSettings.mode ) {
           case 0:
           case 255:
