@@ -16,6 +16,9 @@ Ein simples Spiel für den TonUINO, dass zwei zueinander gehörende Karten erwar
 Ihr müsst dafür auch ein paar MP3s in eurem mp3 Ordner auf der SD-Karte ergänzen/ersetzen. Diese könnt ihr hier herunter laden.
 Löscht bitte zuerst die vorhandenen Dateien 0310 - 0318 sowie die Dateien 0970 - 0976. Diese mussten wegen den erweiterten Modifire Tags umbenannt werden.
 
+HINWEIS: Die Sounds sollten in einem Ordner mit möglichst niedriger Nummer liegen, sonst kann es zu starker Verzögerung beim abspielen
+kommen.
+
 ### Funktion:
 1. Als erstes müsst Ihr die Modifikationskarte "Puzzlespiel" über das Admin Menü erstellen.
 
