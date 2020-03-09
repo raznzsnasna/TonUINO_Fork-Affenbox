@@ -8,7 +8,10 @@ Mein eigener Fork der TonUINO DEV 2.1
 - Ergänzung Ausschalten über langen druck auf Pause Taste
 - Zellspannungsmessung ist jetzt über ein defien zu/abwählbar
 - Serielle Ausgaben können über ein #define zu/abgeschaltete werden (27% Speicherersparnis ohne Ausgaben)
-- beschleunigter setup() durch anpassung der Reihenfolge und entferen des 2sec Delays nach der initialisierung des DFPlayers
+- Support Rotary Encoder KY 040 (#define ROTARY_ENCODER)
+- Hörbuch von bis (Modus 11)
+- zweiter Hörbuch speicher über virtuelle Ordner (101-199)
+
 
 ## Neues Feature: Puzzle Spiel
 
