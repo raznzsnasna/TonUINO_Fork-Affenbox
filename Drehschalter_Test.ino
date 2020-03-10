@@ -12,7 +12,8 @@ uint8_t getSwitchPosition ()
    for (uint8_t x = 0; x <= ROT_SWITCH_POS_NUM; x++)
   {
     if (analogValue > stepMin*x || analogValue < stepMax*x)
-      return x;
+      currentPos = x;
+      return currentPos;
   }
 }
 
