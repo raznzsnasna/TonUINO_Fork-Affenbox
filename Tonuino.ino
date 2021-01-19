@@ -27,6 +27,7 @@
 //#define STARTUP_SOUND
 //#define SPEAKER_SWITCH
 //#define ROTARY_ENCODER
+//#define RE_TIMED
 //////////////////////////////////////////////////////////////////////////
 
 ///////// conifguration of the input and output pin //////////////////////
@@ -61,6 +62,11 @@
 #define pinB 6 //Default 6; Pocket A1
 #define supply 8 //uncomment if you dont want to use an IO pin 
 #endif
+
+#ifdef RE_TIMED
+#define pinREclick  ?? // Welchen Interruptfähigen Pin haben wir noch frei?
+#endif
+
 //////////////////////////////////////////////////////////////////////////
 
 ///////// conifguration of the battery measurement ///////////////////////
@@ -121,6 +127,16 @@ bool ignoreButtonFive = false;
 int16_t oldEncPos = -1 ;
 int16_t encPos = 15;
 ClickEncoder encoder(pinA, pinB, STEPS);
+#endif
+//////////////////////////////////////////////////////////////////////////
+
+//////// rotary encoder timed ////////////////////////////////////////////
+#ifdef RE_TIMED
+const uint_16t re_time = 5000
+volatile uint_16t re_time_until
+ #ifdef DEBUG
+  bool re_locked = false
+ #endif
 #endif
 //////////////////////////////////////////////////////////////////////////
 
@@ -1464,6 +1480,14 @@ void setup() {
     digitalWrite(supply, HIGH);
   #endif
 #endif
+   
+#ifdef RE_TIMED
+  // Lege den Interruptpin als Inputpin mit Pullupwiderstand fest
+  pinMode(pinREclick, INPUT_PULLUP);
+  // Lege die ISR 're_click_interrupt' auf den Interruptpin mit Modus 'CHANGE':
+  // "Bei wechselnder Flanke auf dem Interruptpin" --> "Führe die ISR aus"
+  attachInterrupt(digitalPinToInterrupt(pinREclick), re_click_interrupt, CHANGE);
+#endif
 
 #ifdef SPEAKER_SWITCH
   pinMode(SpeakerOnPin, OUTPUT);
@@ -1864,6 +1888,9 @@ void shutDown () {
 void loop() {
   do {
 #ifdef ROTARY_ENCODER
+#ifdef RE_TIMED
+  if (re_time_until >= millis()) {
+#endif
     encPos += encoder.getValue();
     
     if ((encPos >= oldEncPos +2) || (encPos <= oldEncPos -2))  {
@@ -1888,6 +1915,17 @@ void loop() {
       }
       mp3.setVolume(volume);
     }
+#ifdef RE_TIMED
+  #ifdef DEBUG
+   else 
+  if (re_locked) {
+   Serial.println("Lautstaerkeaenderung durch RE gesperrt");
+   re_locked = false;
+  }
+  #endif
+ 
+  }
+#endif
 #endif
     checkStandbyAtMillis();
     mp3.loop();
@@ -2905,6 +2943,18 @@ bool checkTwo ( uint8_t a[], uint8_t b[] ) {
 void timerIsr()
 {
   encoder.service();
+  #ifdef RE_TIMED
+   #ifdef DEBUG
+   re_locked = true;
+   #endif
+  #endif
+}
+#endif
+
+#ifdef RE_TIMED
+void re_click_interrupt() {
+  // setze den RE_Timer 
+  re_time_until = millis() + re_time;
 }
 #endif
 
